@@ -44,10 +44,10 @@ set(LOGROTATE_CONTAINER_LOGGER_TARGET logrotate_container_logger
   CACHE STRING "Library containing the logrotate container logger.")
 set(MESOS_LOGROTATE_LOGGER_TARGET mesos-logrotate-logger
   CACHE STRING "Executable used by the logrotate container logger.")
-set(MESOS_TARGET mesos
-  CACHE STRING "Target that includes libmesos and all required binaries")
-set(MESOS_LIBS_TARGET mesos-1.0.1
-  CACHE STRING "Library of master and agent code")  
+set(EXECUTABLE_OUTPUT_PATH /usr/local/libexec/mesos)
+set(LIBRARY_OUTPUT_PATH /usr/local/lib/mesos/modules)
+set(MESOS_LIBS_TARGET ${MESOS_INSTALLATION_DIR}/lib)
+  
 
 link_directories(
     ${MESOS_INSTALLATION_DIR}/lib/
@@ -64,6 +64,7 @@ include_directories(
     ${MESOS_SRC_DIR}/src
     ${MESOS_INSTALLATION_DIR}/include/
     ${MESOS_INSTALLATION_DIR}/include/mesos
+    ${MESOS_INSTALLATION_DIR}/lib
     ${MESOS_INSTALLATION_DIR}/lib/mesos/3rdparty/include
     ${CMAKE_BINARY_DIR}/
     $(CMAKE_INCLUDE_PATH)
@@ -73,19 +74,20 @@ add_definitions(
     -DSOURCE_DIR="${MESOS_SRC_DIR}/src"
     -DBUILD_DIR="${MESOS_SRC_DIR}/build"
     -DPKGMODULEDIR="nowhere"
-    -DLIBDIR="nowhere"
-    -DPKGLIBEXECDIR="nowhere"
+    -DLIBDIR="/usr/local/lib/mesos"
+    -DPKGLIBEXECDIR="/usr/local/libexec/mesos"
     -DTESTLIBEXECDIR="nowhere"
-    -DSBINDIR="nowhere"
+    -DSBINDIR="/usr/local/sbin"
     -DPKGDATADIR="nowhere"
-    -DVERSION="1.0.1"
+    -DVERSION="1.3.0"
 )
 
 
+set(MESOS_LIBS_TARGET ${MESOS_INSTALLATION_DIR}/lib)
 
 
 # Module.
-add_library(${LOGROTATE_CONTAINER_LOGGER_TARGET} lib_logrotate.cpp)
+add_library(${LOGROTATE_CONTAINER_LOGGER_TARGET} SHARED lib_logrotate.cpp)
 add_executable(${MESOS_LOGROTATE_LOGGER_TARGET} ${MESOS_LOGROTATE_LOGGER_SRC})
 
 
@@ -119,10 +121,17 @@ target_link_libraries(${LOGROTATE_CONTAINER_LOGGER_TARGET}
     systemd
 )
 
-#add_dependencies(${MESOS_LOGROTATE_LOGGER_TARGET} ${MESOS_LIBS_TARGET})
+#add_dependencies(${MESOS_TARGET} ${LOGROTATE_CONTAINER_LOGGER_TARGET})
 
-#add_test(NAME mesos-journald-container-logger-tests
-   # COMMAND mesos-journald-container-logger-tests)
+  add_dependencies(
+    ${LOGROTATE_CONTAINER_LOGGER_TARGET}
+    
+    ${MESOS_LOGROTATE_LOGGER_TARGET}
+    )
+
+#add_dependencies(${MESOS_LOGROTATE_LOGGER_TARGET} mesos)
+
+
 
 set(WITH_SOURCE_MESOS "" CACHE STRING "Mesos source directory")
 set(MESOS_SOURCE_DIR ${WITH_SOURCE_MESOS})
