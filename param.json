@@ -1,0 +1,18 @@
+{"libraries":[
+    {"file":"/usr/local/lib/mesos/modules/liblogrotate_container_logger.so",
+	"modules":[
+        {"name":"org_apache_mesos_LogrotateContainerLogger",
+		    "parameters":[  
+                {
+                   "key":"max_stdout_size","value":"5KB"
+                },
+               
+                {
+                  "key": "logrotate_stdout_options",
+                  "value": "rotate 9\ncompress"
+                },
+                {
+                    "key":"user_path",
+                       "value":"/home/jones/Desktop/new/"
+                }
+        ]}]}]}
