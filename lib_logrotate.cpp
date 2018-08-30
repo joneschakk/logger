@@ -43,13 +43,14 @@
 #include <stout/os/environment.hpp>
 #include <stout/os/fcntl.hpp>
 #include <stout/os/killtree.hpp>
-
+#include <thread>         // std::this_thread::sleep_for
+#include <chrono>
 #ifdef __linux__
 #include "linux/systemd.hpp"
 #endif // __linux__
 
-#include "slave/container_loggers/logrotate.hpp"
-#include "slave/container_loggers/lib_logrotate.hpp"
+#include "logrotate.hpp"//editedJONES #include "slave/container_loggers/logrotate.hpp"
+#include "lib_logrotate.hpp"//editedJONES #include "slave/container_loggers/lib_logrotate.hpp"
 #include <iostream>
 
 using namespace mesos;
@@ -178,8 +179,7 @@ public:
     outFlags.logrotate_path = flags.logrotate_path;
     outFlags.user = user;
     outFlags.usr_path = flags.usr_path;  //editedJONES
-    //std::cerr<<"string which jones wants"<<outFlags.usr_path<<"\n\n\n\n\n\n";
-    //std::cout<<"\n\n\n\n\n\n\n\n\n"<<flags.usr_path;
+   
     // If we are on systemd, then extend the life of the process as we
     // do with the executor. Any grandchildren's lives will also be
     // extended.
@@ -201,6 +201,10 @@ public:
         environment,
         None(),
         parentHooks);
+    for (int i=10; i>0; --i) {
+    std::cout << i << std::endl;
+    std::this_thread::sleep_for (std::chrono::seconds(5));
+  }
 
     if (outProcess.isError()) {
       os::close(outfds.write.get());
@@ -323,8 +327,8 @@ org_apache_mesos_LogrotateContainerLogger(
       foreach (const Parameter& parameter, parameters.parameter()) {
         {
           values[parameter.key()] = parameter.value();
-          if (parameter.key() == "user_path")    //editedJONES
-            flags.user_path = values[parameter.key()];
+          if (parameter.key() == "usr_path")    //editedJONES
+            flags.usr_path = values[parameter.key()];
 
         }  
       }
