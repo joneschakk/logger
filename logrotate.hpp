@@ -129,7 +129,7 @@ struct Flags : public virtual flags::FlagsBase
   }
 
   Bytes max_size;
-  std::string user_path;
+  std::string usr_path;
   Option<std::string> logrotate_options;
   Option<std::string> log_filename;
   std::string logrotate_path;
