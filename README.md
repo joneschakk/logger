@@ -5,3 +5,8 @@ and puts them in respective install dir
 /usr/local/lib/mesos/modules - liblogrotate_container_logger.so
 
 the json file gives the parameters needed
+
+
+#edit batch wise to file wise
+#lorotate at executor termination
+
