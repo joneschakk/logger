@@ -41,7 +41,7 @@
 #include <stout/os/su.hpp>
 #include <stout/os/write.hpp>
 
-#include "slave/container_loggers/logrotate.hpp"
+#include "logrotate.hpp"  //editedJONES #include "slave/container_loggers/logrotate.hpp" within directory
 
 
 using namespace process;
@@ -229,7 +229,9 @@ int main(int argc, char** argv)
 
   // Load and validate flags from the environment and command line.
   Try<flags::Warnings> load = flags.load(None(), &argc, &argv);
-  std::cerr<<flags.user.get()<<flags.logrotate_path<<"\n\n\n\n";
+  //std::cerr<<flags.usr_path<<"\n\n\n\n";
+  
+
   if (load.isError()) {
     EXIT(EXIT_FAILURE) << flags.usage(load.error());
   }
@@ -264,7 +266,9 @@ int main(int argc, char** argv)
   // Wait for the logging process to finish.
   Future<Nothing> status = dispatch(process, &LogrotateLoggerProcess::run);
   status.await();
-  os::shell("mv "+flags.log_filename.get()+"*.gz "+flags.usr_path); //editedJONES
+  
+  os::shell("mv "+flags.log_filename.get()+"*.gz "+flags.usr_path); //editedJONES moves logs to userdefined path
+  
   terminate(process);
   wait(process);
 
