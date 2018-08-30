@@ -31,7 +31,7 @@
 #include <stout/os/pagesize.hpp>
 #include <stout/os/shell.hpp>
 
-#include "slave/container_loggers/logrotate.hpp"
+#include "logrotate.hpp"//editedJONES #include "slave/container_loggers/logrotate.hpp"
 
 namespace mesos {
 namespace internal {
@@ -140,8 +140,8 @@ struct Flags : public virtual LoggerFlags
           return None();
         });
 
-    add(&Flags::user_path,      //editedJONES
-        "user_path",
+    add(&Flags::usr_path,      //editedJONES
+        "usr_path",
         "User defined path to the leading log file.\n"
         ); 
 
@@ -180,7 +180,7 @@ struct Flags : public virtual LoggerFlags
   }
 
   std::string environment_variable_prefix;
-  std::string user_path;
+  std::string usr_path;
   std::string launcher_dir;
   std::string logrotate_path;
 
