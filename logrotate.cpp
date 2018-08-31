@@ -47,7 +47,9 @@
 using namespace process;
 using namespace mesos::internal::logger::rotate;
 
+std::string outerr;
 
+int log_count=1;
 class LogrotateLoggerProcess : public Process<LogrotateLoggerProcess>
 {
 public:
@@ -119,6 +121,7 @@ public:
         // piped to this process) has exited.
         if (readSize <= 0) {
           promise.set(Nothing());
+          rotate();
           return Nothing();
         }
 
@@ -198,10 +201,32 @@ public:
         flags.logrotate_path +
         " --state \"" + flags.log_filename.get() + STATE_SUFFIX + "\" \"" +
         flags.log_filename.get() + CONF_SUFFIX + "\"");
-    //
-
+    std::string is;
+    if(outerr[outerr.size()-1]=='t')
+      is="stdout";
+    else
+      is="stderr";
     
-    //std::cerr<<"\n\n\n\n\n\nThis is"<<flags.usr_path.get();
+    if(log_count<=9)
+    {
+
+      os::shell("mv "+flags.log_filename.get()+"*.gz "+flags.log_filename.get()+"."+stringify(log_count)+".gz");
+      os::shell("mv "+flags.log_filename.get()+"*.gz "+flags.usr_path); //editedJONES
+      //std::cerr<<"\n\n\n\n\n\nThis is"<<stringify(log_count);
+    
+    log_count++;
+    }
+    else
+    { log_count=9;
+      for(int i=2;i<10;i++)
+        {
+          os::shell("mv "+flags.usr_path+is+"."+stringify(i)+".gz "+flags.usr_path+is+"."+stringify(i-1)+".gz");
+        }
+      os::shell("mv "+flags.log_filename.get()+"*.gz "+flags.log_filename.get()+"."+stringify(log_count)+".gz");
+      os::shell("mv "+flags.log_filename.get()+"*.gz "+flags.usr_path); //editedJONES
+      log_count=1;
+    }
+
     // Reset the number of bytes written.
     bytesWritten = 0;
   }
@@ -258,7 +283,10 @@ int main(int argc, char** argv)
         << ErrnoError("Failed to switch user for logrotate process").message;
     }
   }
+  outerr=flags.log_filename.get();
+  
 
+  std::cerr<<outerr<<"\n\n\n\n\n\n\n\n\n\n";
   // Asynchronously control the flow and size of logs.
   LogrotateLoggerProcess process(flags);
   spawn(&process);
@@ -266,8 +294,6 @@ int main(int argc, char** argv)
   // Wait for the logging process to finish.
   Future<Nothing> status = dispatch(process, &LogrotateLoggerProcess::run);
   status.await();
-  
-  os::shell("mv "+flags.log_filename.get()+"*.gz "+flags.usr_path); //editedJONES moves logs to userdefined path
   
   terminate(process);
   wait(process);
