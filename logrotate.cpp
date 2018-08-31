@@ -209,8 +209,10 @@ public:
     
     if(log_count<=9)
     {
-
-      os::shell("mv "+flags.log_filename.get()+"*.gz "+flags.log_filename.get()+"."+stringify(log_count)+".gz");
+      if(log_count!=1)
+      {
+       os::shell("mv "+flags.log_filename.get()+"*.gz "+flags.log_filename.get()+"."+stringify(log_count)+".gz");
+      }
       os::shell("mv "+flags.log_filename.get()+"*.gz "+flags.usr_path); //editedJONES
       //std::cerr<<"\n\n\n\n\n\nThis is"<<stringify(log_count);
     
