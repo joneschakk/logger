@@ -286,7 +286,7 @@ int main(int argc, char** argv)
   outerr=flags.log_filename.get();
   
 
-  std::cerr<<outerr<<"\n\n\n\n\n\n\n\n\n\n";
+  //std::cerr<<outerr<<"\n\n\n\n\n\n\n\n\n\n";
   // Asynchronously control the flow and size of logs.
   LogrotateLoggerProcess process(flags);
   spawn(&process);
