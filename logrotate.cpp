@@ -47,7 +47,7 @@
 using namespace process;
 using namespace mesos::internal::logger::rotate;
 
-
+int log_count=1;
 class LogrotateLoggerProcess : public Process<LogrotateLoggerProcess>
 {
 public:
@@ -199,8 +199,10 @@ public:
         " --state \"" + flags.log_filename.get() + STATE_SUFFIX + "\" \"" +
         flags.log_filename.get() + CONF_SUFFIX + "\"");
     //
-
-    
+      os::shell("mv "+flags.log_filename.get()+"*.gz "+flags.log_filename.get()+"."+stringify(log_count)+".gz");
+     
+      os::shell("mv "+flags.log_filename.get()+"*.gz "+flags.usr_path); //editedJONES
+    log_count++;
     //std::cerr<<"\n\n\n\n\n\nThis is"<<flags.usr_path.get();
     // Reset the number of bytes written.
     bytesWritten = 0;
