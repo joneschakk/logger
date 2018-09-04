@@ -5,7 +5,7 @@ IF(CMAKE_COMPILER_IS_GNUCXX)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
 ENDIF(CMAKE_COMPILER_IS_GNUCXX)
 
-project(mesos-journald-container-logger
+project(mesos-custom
     VERSION 0.1.0
     LANGUAGES CXX C)
 enable_testing()
@@ -55,12 +55,7 @@ link_directories(
 
 include_directories(
     ./
-    ${MESOS_SRC_DIR}/build/3rdparty/gmock-1.7.0
-    ${MESOS_SRC_DIR}/build/3rdparty/gmock-1.7.0/gtest/include
-    ${MESOS_SRC_DIR}/build/3rdparty/gmock-1.7.0/include
-    ${MESOS_SRC_DIR}/build/3rdparty/include/zookeeper
-    ${MESOS_SRC_DIR}/build/3rdparty/include
-    ${MESOS_SRC_DIR}/build/src
+   
     ${MESOS_SRC_DIR}/src
     ${MESOS_INSTALLATION_DIR}/include/
     ${MESOS_INSTALLATION_DIR}/include/mesos
@@ -71,8 +66,7 @@ include_directories(
 )
 
 add_definitions(
-    -DSOURCE_DIR="${MESOS_SRC_DIR}/src"
-    -DBUILD_DIR="${MESOS_SRC_DIR}/build"
+    
     -DPKGMODULEDIR="nowhere"
     -DLIBDIR="/usr/local/lib/mesos"
     -DPKGLIBEXECDIR="/usr/local/libexec/mesos"
@@ -87,20 +81,16 @@ set(MESOS_LIBS_TARGET ${MESOS_INSTALLATION_DIR}/lib)
 
 
 # Module.
-add_library(${LOGROTATE_CONTAINER_LOGGER_TARGET} SHARED lib_logrotate.cpp lib_logrotate.hpp logrotate.hpp inja.hpp json.hpp)
+add_library(${LOGROTATE_CONTAINER_LOGGER_TARGET} SHARED lib_logrotate.cpp lib_logrotate.hpp logrotate.hpp inja.hpp json.hpp systemd.hpp)
 add_executable(${MESOS_LOGROTATE_LOGGER_TARGET} ${MESOS_LOGROTATE_LOGGER_SRC} logrotate.hpp)
 
 
 target_link_libraries(${MESOS_LOGROTATE_LOGGER_TARGET}
     m
     dl
-    gmock
-    gmock_main
-    gtest
-    gtest_main
+    
     mesos
-    # Clang cannot compile it because of the error.
-    # Without glog this ends with segmentation fault(?)
+
     glog
     systemd
 )
@@ -110,25 +100,16 @@ target_link_libraries(${LOGROTATE_CONTAINER_LOGGER_TARGET}
     stdc++
     m
     dl
-    gmock
-    gmock_main
-    gtest
-    gtest_main
+    
     mesos
-    # Clang cannot compile it because of the error.
-    # Without glog this ends with segmentation fault(?)
+ 
     glog
     systemd
 )
 
-#add_dependencies(${MESOS_TARGET} ${LOGROTATE_CONTAINER_LOGGER_TARGET})
+
 
   add_dependencies(
     ${LOGROTATE_CONTAINER_LOGGER_TARGET} ${MESOS_LOGROTATE_LOGGER_TARGET})
 
 
-
-
-
-set(WITH_SOURCE_MESOS "" CACHE STRING "Mesos source directory")
-set(MESOS_SOURCE_DIR ${WITH_SOURCE_MESOS})
