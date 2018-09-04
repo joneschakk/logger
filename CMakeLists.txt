@@ -56,7 +56,7 @@ link_directories(
 include_directories(
     ./
    
-    ${MESOS_SRC_DIR}/src
+    #${MESOS_SRC_DIR}/src
     ${MESOS_INSTALLATION_DIR}/include/
     ${MESOS_INSTALLATION_DIR}/include/mesos
     ${MESOS_INSTALLATION_DIR}/lib
