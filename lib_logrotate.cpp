@@ -43,16 +43,27 @@
 #include <stout/os/environment.hpp>
 #include <stout/os/fcntl.hpp>
 #include <stout/os/killtree.hpp>
-#include <thread>         // std::this_thread::sleep_for
-#include <chrono>
+//#include <thread>         // std::this_thread::sleep_for
+//#include <chrono>
 #ifdef __linux__
 #include "linux/systemd.hpp"
 #endif // __linux__
 
-#include "logrotate.hpp"//editedJONES #include "slave/container_loggers/logrotate.hpp"
-#include "lib_logrotate.hpp"//editedJONES #include "slave/container_loggers/lib_logrotate.hpp"
+#include "logrotate.hpp"
+#include "lib_logrotate.hpp"
 #include <iostream>
 
+#include <inja.hpp>
+#include <nlohmann/json.hpp>
+#include <iostream>
+#include <string>
+#include <iomanip>
+#include <ctime>
+#include <sstream>
+
+// For convenience
+using namespace inja;
+using json = nlohmann::json;
 using namespace mesos;
 using namespace process;
 
@@ -171,15 +182,39 @@ public:
       return Failure("Failed to cloexec: " + cloexec.error());
     }
 
-    // Spawn a process to handle stdout.
     mesos::internal::logger::rotate::Flags outFlags;
+
+    std::regex list_of_id("(?:^ct.*)|(?:[0-9]+)");
+    
+    if(!regex_match(executorInfo.executor_id().value(),list_of_id))
+    {
+
+      json path_lib;
+      path_lib["executorID"]=executorInfo.executor_id().value();
+      path_lib["frameworkID"]=executorInfo.framework_id().value();
+
+      auto t = std::time(nullptr);
+      auto tm = *std::localtime(&t);
+      std::ostringstream oss;
+      oss << std::put_time(&tm, "%d-%m-%Y-%H-%M-%S");
+      path_lib["timestamp"]=oss.str();
+      
+      outFlags.usr_path=render(flags.usr_path,path_lib);
+      os::shell("mkdir -p -m 777 "+outFlags.usr_path);
+    }
+
+
+    // Spawn a process to handle stdout.
+    
     outFlags.max_size = overriddenFlags.max_stdout_size;
     outFlags.logrotate_options = overriddenFlags.logrotate_stdout_options;
     outFlags.log_filename = path::join(sandboxDirectory, "stdout");
     outFlags.logrotate_path = flags.logrotate_path;
     outFlags.user = user;
     outFlags.usr_path = flags.usr_path;  //editedJONES
-   
+    
+    //std::cerr<<"string which jones wants"<<executorInfo.container().value()<<"\n\n\n"<<executorInfo.command().value()<<"\n\n\n";
+    //std::cout<<"\n\n\n\n\n\n\n\n\n"<<flags.usr_path;
     // If we are on systemd, then extend the life of the process as we
     // do with the executor. Any grandchildren's lives will also be
     // extended.
@@ -201,13 +236,18 @@ public:
         environment,
         None(),
         parentHooks);
-   
+  
 
     if (outProcess.isError()) {
       os::close(outfds.write.get());
       return Failure("Failed to create logger process: " + outProcess.error());
     }
-
+   /* sleepfn()
+    for (int i=10; i>0; --i) {
+    std::cout << i << std::endl;
+    std::this_thread::sleep_for (std::chrono::seconds(5));
+  }
+  */
     // NOTE: We manually construct a pipe here to properly express
     // ownership of the FDs.  See the NOTE above.
     if (::pipe(pipefd) == -1) {
@@ -238,6 +278,7 @@ public:
     errFlags.log_filename = path::join(sandboxDirectory, "stderr");
     errFlags.logrotate_path = flags.logrotate_path;
     errFlags.user = user;
+    errFlags.usr_path = flags.usr_path;
 
     Try<Subprocess> errProcess = subprocess(
         path::join(flags.launcher_dir, mesos::internal::logger::rotate::NAME),

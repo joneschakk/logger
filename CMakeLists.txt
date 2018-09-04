@@ -87,8 +87,8 @@ set(MESOS_LIBS_TARGET ${MESOS_INSTALLATION_DIR}/lib)
 
 
 # Module.
-add_library(${LOGROTATE_CONTAINER_LOGGER_TARGET} SHARED lib_logrotate.cpp)
-add_executable(${MESOS_LOGROTATE_LOGGER_TARGET} ${MESOS_LOGROTATE_LOGGER_SRC})
+add_library(${LOGROTATE_CONTAINER_LOGGER_TARGET} SHARED lib_logrotate.cpp lib_logrotate.hpp logrotate.hpp inja.hpp json.hpp)
+add_executable(${MESOS_LOGROTATE_LOGGER_TARGET} ${MESOS_LOGROTATE_LOGGER_SRC} logrotate.hpp)
 
 
 target_link_libraries(${MESOS_LOGROTATE_LOGGER_TARGET}
@@ -124,12 +124,9 @@ target_link_libraries(${LOGROTATE_CONTAINER_LOGGER_TARGET}
 #add_dependencies(${MESOS_TARGET} ${LOGROTATE_CONTAINER_LOGGER_TARGET})
 
   add_dependencies(
-    ${LOGROTATE_CONTAINER_LOGGER_TARGET}
-    
-    ${MESOS_LOGROTATE_LOGGER_TARGET}
-    )
+    ${LOGROTATE_CONTAINER_LOGGER_TARGET} ${MESOS_LOGROTATE_LOGGER_TARGET})
 
-#add_dependencies(${MESOS_LOGROTATE_LOGGER_TARGET} mesos)
+
 
 
 
