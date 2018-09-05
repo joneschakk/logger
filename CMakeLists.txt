@@ -1,5 +1,4 @@
-# Based on https://github.com/mesosphere/serenity/blob/master/CMakeLists.txt
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.0.0) 
 
 IF(CMAKE_COMPILER_IS_GNUCXX)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
@@ -11,7 +10,7 @@ project(mesos-custom
 enable_testing()
 
 # Command line options.
-set(WITH_MESOS "/usr/local" CACHE STRING "Mesos installation directory")
+set(WITH_MESOS "/usr" CACHE STRING "Mesos installation directory")
 set(MESOS_INSTALLATION_DIR ${WITH_MESOS})
 message("Mesos installation directory set to: " ${MESOS_INSTALLATION_DIR})
 
@@ -34,7 +33,7 @@ endif(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
 
 # Add gtest.
-			add_subdirectory (${MESOS_SRC_DIR}/build/3rdparty/gmock-1.7.0)
+#			add_subdirectory (${MESOS_SRC_DIR}/build/3rdparty/gmock-1.7.0)
 #include_directories(${gmock_SOURCE_DIR} include)
 #include_directories(${gtest_SOURCE_DIR} include)
 
@@ -44,13 +43,15 @@ set(LOGROTATE_CONTAINER_LOGGER_TARGET logrotate_container_logger
   CACHE STRING "Library containing the logrotate container logger.")
 set(MESOS_LOGROTATE_LOGGER_TARGET mesos-logrotate-logger
   CACHE STRING "Executable used by the logrotate container logger.")
-set(EXECUTABLE_OUTPUT_PATH /usr/local/libexec/mesos)
-set(LIBRARY_OUTPUT_PATH /usr/local/lib/mesos/modules)
-set(MESOS_LIBS_TARGET ${MESOS_INSTALLATION_DIR}/lib)
+set(EXECUTABLE_OUTPUT_PATH /opt/mesos-build/logger)
+set(LIBRARY_OUTPUT_PATH /opt/mesos-build/logger)
+
+#set(MESOS_LIBS_TARGET ${MESOS_INSTALLATION_DIR}/lib)
   
 
 link_directories(
     ${MESOS_INSTALLATION_DIR}/lib/
+${MESOS_INSTALLATION_DIR}/lib
     ${MESOS_INSTALLATION_DIR}/lib/mesos/3rdparty/lib)
 
 include_directories(
@@ -62,16 +63,20 @@ include_directories(
     ${MESOS_INSTALLATION_DIR}/lib
     ${MESOS_INSTALLATION_DIR}/lib/mesos/3rdparty/include
     ${CMAKE_BINARY_DIR}/
+    ${MESOS_INSTALLATION_DIR}/lib64
     $(CMAKE_INCLUDE_PATH)
 )
 
 add_definitions(
     
     -DPKGMODULEDIR="nowhere"
-    -DLIBDIR="/usr/local/lib/mesos"
-    -DPKGLIBEXECDIR="/usr/local/libexec/mesos"
+   # -DLIBDIR="/usr/local/lib/mesos"
+-DLIBDIR="nowhere"  
+ # -DPKGLIBEXECDIR="/usr/local/libexec/mesos"
+-DPKGLIBEXECDIR="nowhere"
     -DTESTLIBEXECDIR="nowhere"
-    -DSBINDIR="/usr/local/sbin"
+   # -DSBINDIR="/usr/local/sbin"
+-DSBINDIR="nowhere"
     -DPKGDATADIR="nowhere"
     -DVERSION="1.3.0"
 )
@@ -86,6 +91,7 @@ add_executable(${MESOS_LOGROTATE_LOGGER_TARGET} ${MESOS_LOGROTATE_LOGGER_SRC} lo
 
 
 target_link_libraries(${MESOS_LOGROTATE_LOGGER_TARGET}
+    stdc++
     m
     dl
     
@@ -111,5 +117,3 @@ target_link_libraries(${LOGROTATE_CONTAINER_LOGGER_TARGET}
 
   add_dependencies(
     ${LOGROTATE_CONTAINER_LOGGER_TARGET} ${MESOS_LOGROTATE_LOGGER_TARGET})
-
-
