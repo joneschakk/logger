@@ -1,0 +1,1 @@
+/usr/bin/c++    -DPKGLIBEXECDIR="/opt/mesos" -std=c++11 -fPIC -Wno-deprecated-declarations    -Wl,-warn-unresolved-symbols CMakeFiles/logger-companion.dir/companion.o  -o logger-companion  -L/usr/lib/mesos/3rdparty/lib -rdynamic -lmesos -Wl,-rpath,/usr/lib/mesos/3rdparty/lib 

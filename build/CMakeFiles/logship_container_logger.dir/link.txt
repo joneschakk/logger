@@ -1,0 +1,1 @@
+/usr/bin/c++  -fPIC  -DPKGLIBEXECDIR="/opt/mesos" -std=c++11 -fPIC -Wno-deprecated-declarations   -shared -Wl,-soname,liblogship_container_logger.so -o liblogship_container_logger.so CMakeFiles/logship_container_logger.dir/lib_logship.o  -L/usr/lib/mesos/3rdparty/lib -lmesos -lmesos -Wl,-rpath,/usr/lib/mesos/3rdparty/lib 

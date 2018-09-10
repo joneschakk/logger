@@ -1,0 +1,2 @@
+/opt/mesos-custom-logger/build/CMakeFiles/logger-companion.dir
+/opt/mesos-custom-logger/build/CMakeFiles/logship_container_logger.dir
